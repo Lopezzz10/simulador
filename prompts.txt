@@ -1,0 +1,12 @@
+//prompt 1 : Mejora el diseño visual del simulador de crédito dándole un aspecto empresarial 
+y profesional. Usa una entidad financiera ficticia llamada BancoNova con colores 
+azul marino y dorado. El diseño debe ser responsive, con tipografía elegante, 
+tarjetas con sombras, un header con logo, y un footer institucional
+
+//prompt2 : Agrega estilos para el estado del crédito: que se muestre de forma destacada 
+cuando diga CREDITO APROBADO o CREDITO RECHAZADO, usando una tipografía 
+grande y elegante
+
+//prompt3 : Asegúrate de que el diseño sea completamente responsive para pantallas móviles, 
+usando media queries para adaptar el grid de dos columnas a una sola columna 
+en pantallas menores a 640px

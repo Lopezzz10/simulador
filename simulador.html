@@ -1,48 +1,130 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <script src="funciones.js"></script>
-    <script src="simulador.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Crédito</title>
+    <title>BancoNova - Simulador de Crédito</title>
     <link rel="stylesheet" href="simulador.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="funciones.js"></script>
+    <script src="simulador.js"></script>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Simulador de Crédito</h1>
+    <header class="header">
+        <div class="header-inner">
+            <div class="logo">
+                <div class="logo-icon">BN</div>
+                <div class="logo-text">
+                    <span class="logo-name">BancoNova</span>
+                    <span class="logo-slogan">Tu futuro, nuestra misión</span>
+                </div>
+            </div>
+        </div>
+    </header>
 
-        <h2>Datos financieros</h2>
-        <label for="txtIngresos">Ingresos:</label>
-        <input type="text" id="txtIngresos">
+    <main class="main">
+        <div class="hero">
+            <h1 class="hero-title">Simulador de <span class="accent">Crédito</span></h1>
+            <p class="hero-sub">Conoce tu capacidad de endeudamiento en segundos</p>
+        </div>
 
-        <label for="txtEgresos">Egresos:</label>
-        <input type="text" id="txtEgresos">
+        <div class="card-grid">
 
-        <p>Disponible: <span id="spnDisponible"></span></p>
-        <p>Capacidad de pago mensual: <span id="spnCapacidadPago"></span></p>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">💰</div>
+                    <h2>Datos Financieros</h2>
+                </div>
+                <div class="card-body">
+                    <div class="field">
+                        <label for="txtIngresos">Ingresos mensuales</label>
+                        <div class="input-wrap">
+                            <span class="prefix">USD</span>
+                            <input type="number" id="txtIngresos" placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="txtEgresos">Egresos mensuales</label>
+                        <div class="input-wrap">
+                            <span class="prefix">USD</span>
+                            <input type="number" id="txtEgresos" placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-item">
+                            <span class="result-label">Disponible mensual</span>
+                            <span class="result-value" id="spnDisponible">—</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Capacidad de pago</span>
+                            <span class="result-value" id="spnCapacidadPago">—</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <h2>Solicitud de crédito</h2>
-        <label for="txtMonto">Monto:</label>
-        <input type="text" id="txtMonto">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🏦</div>
+                    <h2>Solicitud de Crédito</h2>
+                </div>
+                <div class="card-body">
+                    <div class="field">
+                        <label for="txtMonto">Monto solicitado</label>
+                        <div class="input-wrap">
+                            <span class="prefix">USD</span>
+                            <input type="number" id="txtMonto" placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="txtPlazo">Plazo (años)</label>
+                            <div class="input-wrap">
+                                <input type="number" id="txtPlazo" placeholder="1">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="txtTasaInteres">Tasa anual (%)</label>
+                            <div class="input-wrap">
+                                <input type="number" id="txtTasaInteres" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-item">
+                            <span class="result-label">Interés a pagar</span>
+                            <span class="result-value" id="spnInteresPagar">—</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Total préstamo</span>
+                            <span class="result-value" id="spnTotalPrestamo">—</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Cuota mensual</span>
+                            <span class="result-value" id="spnCuotaMensual">—</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <label for="txtPlazo">Plazo en años:</label>
-        <input type="text" id="txtPlazo">
+        </div>
 
-        <label for="txtTasaInteres">Tasa de interés:</label>
-        <input type="text" id="txtTasaInteres">
-
-        <p>Interés a pagar: <span id="spnInteresPagar"></span></p>
-        <p>Total préstamo: <span id="spnTotalPrestamo"></span></p>
-        <p>Cuota mensual: <span id="spnCuotaMensual"></span></p>
-        <p>Estado de crédito: <span id="spnEstadoCredito">ANALIZANDO...</span></p>
+        <div class="estado-wrap">
+            <div class="estado-label">Estado de crédito</div>
+            <span id="spnEstadoCredito" class="estado-badge">ANALIZANDO...</span>
+        </div>
 
         <div class="buttons">
             <button id="btnCalcularCredito" onclick="calcular()">Calcular Crédito</button>
-            <button id="btnReiniciar">Reiniciar</button>
+            <button id="btnReiniciar" onclick="location.reload()">Reiniciar</button>
         </div>
-    </div>
+
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 BancoNova · Todos los derechos reservados · Regulado por la Superintendencia de Bancos</p>
+    </footer>
 
 </body>
 </html>

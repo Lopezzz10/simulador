@@ -7,4 +7,11 @@ function calcular() {
 
     let capacidadPago = calcularCapacidadPago(disponible);
     document.getElementById("spnCapacidadPago").innerHTML = "USD " + capacidadPago.toFixed(2);
+
+    let monto = parseInt(document.getElementById("txtMonto").value);
+    let plazo = parseInt(document.getElementById("txtPlazo").value);
+    let tasa = parseInt(document.getElementById("txtTasaInteres").value);
+
+    let interes = calcularInteresSimple(monto, tasa, plazo);
+    document.getElementById("spnInteresPagar").innerHTML = "USD " + interes.toFixed(2);
 }

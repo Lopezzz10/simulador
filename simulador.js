@@ -4,4 +4,7 @@ function calcular() {
 
     let disponible = calcularDisponible(ingresos, egresos);
     document.getElementById("spnDisponible").innerHTML = "USD " + disponible.toFixed(2);
+
+    let capacidadPago = calcularCapacidadPago(disponible);
+    document.getElementById("spnCapacidadPago").innerHTML = "USD " + capacidadPago.toFixed(2);
 }

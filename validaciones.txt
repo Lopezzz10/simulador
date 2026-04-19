@@ -1,0 +1,5 @@
+//prompt1  : agrega validaciones al formulario, que los campos no queden vacíos y que solo acepten números
+//prompt2 : el campo de plazo que solo acepte años enteros, nada de decimales
+//prompt3 : ponle montos mínimos y máximos a los campos de dinero, algo razonable para un banco
+//prompt4 : que si los egresos son mayores o iguales a los ingresos salga un error
+//prompt5 : los errores que aparezcan debajo de cada campo en rojo cuando le den al botón calcular

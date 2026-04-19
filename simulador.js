@@ -1,30 +1,136 @@
-function calcular() {
-    let ingresos = parseFloat(document.getElementById("txtIngresos").value);
-    let egresos = parseFloat(document.getElementById("txtEgresos").value);
+const REGLAS = {
+  txtIngresos: {
+    tipo: "decimal", min: 500, max: 100000, requerido: true,
+    mensajes: {
+      requerido: "Los ingresos mensuales son obligatorios.",
+      tipo: "Ingrese un número válido (ej. 1500.00).",
+      min: "El ingreso mínimo aceptado es USD 500.00.",
+      max: "Los ingresos no pueden superar USD 100,000.00.",
+    },
+  },
+  txtEgresos: {
+    tipo: "decimal", min: 0, max: 99999, requerido: true,
+    mensajes: {
+      requerido: "Los egresos mensuales son obligatorios.",
+      tipo: "Ingrese un número válido (ej. 800.00).",
+      min: "Los egresos no pueden ser negativos.",
+      max: "Los egresos no pueden superar USD 99,999.00.",
+    },
+  },
+  txtMonto: {
+    tipo: "decimal", min: 500, max: 500000, requerido: true,
+    mensajes: {
+      requerido: "El monto solicitado es obligatorio.",
+      tipo: "Ingrese un número válido (ej. 10000.00).",
+      min: "El monto mínimo de crédito es USD 500.00.",
+      max: "El monto máximo de crédito es USD 500,000.00.",
+    },
+  },
+  txtPlazo: {
+    tipo: "entero", min: 1, max: 30, requerido: true,
+    mensajes: {
+      requerido: "El plazo es obligatorio.",
+      tipo: "El plazo debe ser un número entero (ej. 5).",
+      min: "El plazo mínimo es 1 año.",
+      max: "El plazo máximo es 30 años.",
+    },
+  },
+  txtTasaInteres: {
+    tipo: "decimal", min: 0.1, max: 30, requerido: true,
+    mensajes: {
+      requerido: "La tasa de interés es obligatoria.",
+      tipo: "Ingrese una tasa válida (ej. 12.5).",
+      min: "La tasa mínima es 0.1%.",
+      max: "La tasa máxima permitida es 30%.",
+    },
+  },
+};
 
-    let disponible = calcularDisponible(ingresos, egresos);
-    document.getElementById("spnDisponible").innerHTML = "USD " + disponible.toFixed(2);
+function limpiarErrores() {
+  document.querySelectorAll(".error-msg").forEach(el => { el.textContent = ""; el.style.display = "none"; });
+  document.querySelectorAll(".input-wrap").forEach(w => w.classList.remove("input-error","input-ok"));
+}
 
-    let capacidadPago = calcularCapacidadPago(disponible);
-    document.getElementById("spnCapacidadPago").innerHTML = "USD " + capacidadPago.toFixed(2);
+function mostrarError(id, msg) {
+  const el = document.getElementById("err_" + id);
+  const wrap = document.getElementById(id).closest(".input-wrap");
+  if (el) { el.textContent = msg; el.style.display = "flex"; }
+  if (wrap) { wrap.classList.add("input-error"); wrap.classList.remove("input-ok"); }
+}
 
-    let monto = parseInt(document.getElementById("txtMonto").value);
-    let plazo = parseInt(document.getElementById("txtPlazo").value);
-    let tasa = parseInt(document.getElementById("txtTasaInteres").value);
+function marcarOk(id) {
+  const wrap = document.getElementById(id).closest(".input-wrap");
+  if (wrap) { wrap.classList.add("input-ok"); wrap.classList.remove("input-error"); }
+}
 
-    let interes = calcularInteresSimple(monto, tasa, plazo);
-    document.getElementById("spnInteresPagar").innerHTML = "USD " + interes.toFixed(2);
+function validarCampo(id) {
+  const regla = REGLAS[id];
+  const raw = document.getElementById(id).value.trim();
 
-    let total = calcularTotalPagar(monto, interes);
-    document.getElementById("spnTotalPrestamo").innerHTML = "USD " + total.toFixed(2);
+  if (raw === "") {
+    mostrarError(id, regla.mensajes.requerido);
+    return false;
+  }
 
-    let cuota = calcularCuotaMensual(total, plazo);
-    document.getElementById("spnCuotaMensual").innerHTML = "USD " + cuota.toFixed(2);
+  let valor;
+  if (regla.tipo === "entero") {
+    if (!/^-?\d+$/.test(raw)) { mostrarError(id, regla.mensajes.tipo); return false; }
+    valor = parseInt(raw, 10);
+  } else {
+    if (isNaN(parseFloat(raw)) || !/^-?\d+(\.\d+)?$/.test(raw)) { mostrarError(id, regla.mensajes.tipo); return false; }
+    valor = parseFloat(raw);
+  }
 
-    let aprobado = aprobarCredito(capacidadPago, cuota);
-    if (aprobado) {
-        document.getElementById("spnEstadoCredito").innerHTML = "CREDITO APROBADO";
-    } else {
-        document.getElementById("spnEstadoCredito").innerHTML = "CREDITO RECHAZADO";
+  if (valor < regla.min) { mostrarError(id, regla.mensajes.min); return false; }
+  if (valor > regla.max) { mostrarError(id, regla.mensajes.max); return false; }
+
+  marcarOk(id);
+  return true;
+}
+
+function validarTodo() {
+  limpiarErrores();
+  const res = Object.keys(REGLAS).map(id => validarCampo(id));
+
+  // Validación cruzada: egresos < ingresos
+  if (res[0] && res[1]) {
+    const ingresos = parseFloat(document.getElementById("txtIngresos").value);
+    const egresos  = parseFloat(document.getElementById("txtEgresos").value);
+    if (egresos >= ingresos) {
+      mostrarError("txtEgresos", "Los egresos deben ser menores a los ingresos.");
+      res[1] = false;
     }
+  }
+  return res.every(Boolean);
+}
+
+function calcular() {
+  if (!validarTodo()) return;
+
+  const ingresos = parseFloat(document.getElementById("txtIngresos").value);
+  const egresos  = parseFloat(document.getElementById("txtEgresos").value);
+  const monto    = parseFloat(document.getElementById("txtMonto").value);
+  const plazo    = parseInt(document.getElementById("txtPlazo").value, 10);
+  const tasa     = parseFloat(document.getElementById("txtTasaInteres").value);
+
+  const disponible    = calcularDisponible(ingresos, egresos);
+  const capacidadPago = calcularCapacidadPago(disponible);
+  const interes       = calcularInteresSimple(monto, tasa, plazo);
+  const total         = calcularTotalPagar(monto, interes);
+  const cuota         = calcularCuotaMensual(total, plazo);
+
+  document.getElementById("spnDisponible").textContent    = "USD " + disponible.toFixed(2);
+  document.getElementById("spnCapacidadPago").textContent = "USD " + capacidadPago.toFixed(2);
+  document.getElementById("spnInteresPagar").textContent  = "USD " + interes.toFixed(2);
+  document.getElementById("spnTotalPrestamo").textContent = "USD " + total.toFixed(2);
+  document.getElementById("spnCuotaMensual").textContent  = "USD " + cuota.toFixed(2);
+
+  const badge = document.getElementById("spnEstadoCredito");
+  if (aprobarCredito(capacidadPago, cuota)) {
+    badge.textContent = "CRÉDITO APROBADO ✔";
+    badge.className = "estado-badge aprobado";
+  } else {
+    badge.textContent = "CRÉDITO RECHAZADO ✘";
+    badge.className = "estado-badge rechazado";
+  }
 }

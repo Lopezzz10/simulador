@@ -270,3 +270,61 @@ button:last-child:hover {
     .field-row { grid-template-columns: 1fr; }
     .estado-wrap { flex-direction: column; gap: 12px; text-align: center; }
 }
+/* ============ VALIDACIONES ============ */
+
+/* Borde rojo al haber error */
+.input-wrap.input-error {
+    border-color: #e53e3e !important;
+    background: #fff5f5;
+}
+
+/* Borde verde si está ok */
+.input-wrap.input-ok {
+    border-color: #38a169 !important;
+    background: #f0fff4;
+}
+
+/* Mensaje de error debajo del campo */
+.error-msg {
+    display: none;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #e53e3e;
+    font-weight: 500;
+}
+.error-msg::before {
+    content: "⚠";
+    font-size: 13px;
+}
+
+/* Hint de ayuda */
+.hint {
+    display: block;
+    font-size: 11px;
+    color: var(--gray-400);
+    margin-top: 4px;
+    letter-spacing: 0.3px;
+}
+
+/* Asterisco requerido */
+.req {
+    color: #e53e3e;
+    font-size: 13px;
+    margin-left: 2px;
+}
+.req-note {
+    font-size: 12px;
+    color: var(--gray-400);
+    margin-top: 12px;
+    text-align: right;
+}
+
+/* Estado aprobado / rechazado */
+.estado-badge.aprobado {
+    color: #38a169;
+}
+.estado-badge.rechazado {
+    color: #e53e3e;
+}

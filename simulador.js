@@ -8,13 +8,28 @@ const REGLAS = {
       max: "Los ingresos no pueden superar USD 100,000.00.",
     },
   },
-  txtEgresos: {
-    tipo: "decimal", min: 0, max: 99999, requerido: true,
+  txtArriendo: {
+    tipo: "decimal", min: 0, max: 99999, requerido: false,
     mensajes: {
-      requerido: "Los egresos mensuales son obligatorios.",
-      tipo: "Ingrese un número válido (ej. 800.00).",
-      min: "Los egresos no pueden ser negativos.",
-      max: "Los egresos no pueden superar USD 99,999.00.",
+      tipo: "Ingrese un número válido (ej. 300.00).",
+      min: "El arriendo no puede ser negativo.",
+      max: "El arriendo no puede superar USD 99,999.00.",
+    },
+  },
+  txtAlimentacion: {
+    tipo: "decimal", min: 0, max: 99999, requerido: false,
+    mensajes: {
+      tipo: "Ingrese un número válido (ej. 200.00).",
+      min: "La alimentación no puede ser negativa.",
+      max: "La alimentación no puede superar USD 99,999.00.",
+    },
+  },
+  txtVarios: {
+    tipo: "decimal", min: 0, max: 99999, requerido: false,
+    mensajes: {
+      tipo: "Ingrese un número válido (ej. 100.00).",
+      min: "El valor de varios no puede ser negativo.",
+      max: "El valor de varios no puede superar USD 99,999.00.",
     },
   },
   txtMonto: {
@@ -68,8 +83,13 @@ function validarCampo(id) {
   const raw = document.getElementById(id).value.trim();
 
   if (raw === "") {
-    mostrarError(id, regla.mensajes.requerido);
-    return false;
+    if (regla.requerido) {
+      mostrarError(id, regla.mensajes.requerido);
+      return false;
+    }
+    // campo opcional vacío: se toma como 0, sin error
+    marcarOk(id);
+    return true;
   }
 
   let valor;
@@ -92,23 +112,37 @@ function validarTodo() {
   limpiarErrores();
   const res = Object.keys(REGLAS).map(id => validarCampo(id));
 
-  // Validación cruzada: egresos < ingresos
-  if (res[0] && res[1]) {
-    const ingresos = parseFloat(document.getElementById("txtIngresos").value);
-    const egresos  = parseFloat(document.getElementById("txtEgresos").value);
-    if (egresos >= ingresos) {
-      mostrarError("txtEgresos", "Los egresos deben ser menores a los ingresos.");
-      res[1] = false;
+  // Validación cruzada: total gastos < ingresos
+  if (res[0]) {
+    const ingresos = parseFloat(document.getElementById("txtIngresos").value) || 0;
+    const totalGastos = obtenerTotalGastos();
+    if (totalGastos >= ingresos) {
+      mostrarError("txtArriendo", "");
+      mostrarError("txtAlimentacion", "");
+      mostrarError("txtVarios", "El total de gastos debe ser menor a los ingresos.");
+      res[3] = false;
     }
   }
   return res.every(Boolean);
+}
+
+function obtenerTotalGastos() {
+  const arriendo     = parseFloat(document.getElementById("txtArriendo").value)     || 0;
+  const alimentacion = parseFloat(document.getElementById("txtAlimentacion").value) || 0;
+  const varios       = parseFloat(document.getElementById("txtVarios").value)       || 0;
+  return arriendo + alimentacion + varios;
+}
+
+function actualizarTotalGastos() {
+  const total = obtenerTotalGastos();
+  document.getElementById("spnTotalGastos").textContent = "USD " + total.toFixed(2);
 }
 
 function calcular() {
   if (!validarTodo()) return;
 
   const ingresos = parseFloat(document.getElementById("txtIngresos").value);
-  const egresos  = parseFloat(document.getElementById("txtEgresos").value);
+  const egresos  = obtenerTotalGastos();
   const monto    = parseFloat(document.getElementById("txtMonto").value);
   const plazo    = parseInt(document.getElementById("txtPlazo").value, 10);
   const tasa     = parseFloat(document.getElementById("txtTasaInteres").value);
@@ -133,4 +167,19 @@ function calcular() {
     badge.textContent = "CRÉDITO RECHAZADO ✘";
     badge.className = "estado-badge rechazado";
   }
+}
+function reiniciar() {
+  ["txtIngresos","txtArriendo","txtAlimentacion","txtVarios","txtMonto","txtPlazo","txtTasaInteres"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  limpiarErrores();
+  document.getElementById("spnTotalGastos").textContent   = "USD 0.00";
+  document.getElementById("spnDisponible").textContent    = "—";
+  document.getElementById("spnCapacidadPago").textContent = "—";
+  document.getElementById("spnInteresPagar").textContent  = "—";
+  document.getElementById("spnTotalPrestamo").textContent = "—";
+  document.getElementById("spnCuotaMensual").textContent  = "—";
+  const badge = document.getElementById("spnEstadoCredito");
+  badge.textContent = "ANALIZANDO...";
+  badge.className = "estado-badge";
 }
